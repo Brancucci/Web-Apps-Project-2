@@ -49,6 +49,7 @@ end
 #        and the last character is >
 def is_non_terminal?(s)
   # TODO: your implementation here
+  s[0] == '<' && s[-1] == '>'
 end
 
 # Given a grammar hash (as returned by to_grammar_hash)
