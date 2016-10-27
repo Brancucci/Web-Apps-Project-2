@@ -23,7 +23,7 @@ end
 #     returns ["<start>", "You <adj> <name> .", ""]
 def split_definition(raw_def)
   # this was working on kant.g with read_grammar_defs returning an array.
-  # raw_def.map{|x| x.gsub("\t","").split(/\n/).slice(1..-1)}.flatten.map{|x| x.gsub("> ", ">").split(/;/)}.flatten
+  raw_def.map{|x| x.gsub("\t","").gsub("> ", ">").split(/\n/).slice(1..-1)}.map{|x| x.map{|y| y.split(";")}.flatten}
 
   # this is following the example above saying that the data comes as a string, although I wasn't able to reproduce the
   # last example where the last element of the array is empty
