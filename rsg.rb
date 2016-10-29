@@ -2,6 +2,7 @@
 # Returns an array of strings where each string is the lines for
 # a given definition (without the braces)
 def read_grammar_defs(filename)
+  puts "inside read_grammar_defs"
   filename = 'grammars/' + filename unless filename.start_with? 'grammars/'
   filename += '.g' unless filename.end_with? '.g'
   contents = open(filename, 'r') { |f| f.read }
@@ -22,12 +23,13 @@ end
 #   split_definition "\n<start>\nYou <adj> <name> . ;\n;\n"
 #     returns ["<start>", "You <adj> <name> .", ""]
 def split_definition(raw_def)
+  puts "inside split_definition"
   # this was working on kant.g with read_grammar_defs returning an array.
-  raw_def.map{|x| x.gsub("\t","").gsub("> ", ">").split(/\n/).slice(1..-1)}.map{|x| x.map{|y| y.split(";")}.flatten}
+  # raw_def.map{|x| x.gsub("\t","").gsub("> ", ">").split(/\n/).slice(1..-1)}.map{|x| x.map{|y| y.split(";")}.flatten}
 
   # this is following the example above saying that the data comes as a string, although I wasn't able to reproduce the
   # last example where the last element of the array is empty
-  # raw_def.gsub("\t","").split(/\n/).slice(1..-1).flatten.map{|x| x.gsub("> ", ">").split(/;/)}.flatten
+  raw_def.gsub("\t","").split(/\n/).slice(1..-1).flatten.map{|x| x.gsub("> ", ">").split(/;/)}.flatten
 
 end
 
@@ -41,14 +43,18 @@ end
 # to_grammar_hash([["<start>", "The   <object>   <verb>   tonight."], ["<object>", "waves", "big    yellow       flowers", "slugs"], ["<verb>", "sigh <adverb>", "portend like <object>", "die <adverb>"], ["<adverb>", "warily", "grumpily"]])
 # returns {"<start>"=>[["The", "<object>", "<verb>", "tonight."]], "<object>"=>[["waves"], ["big", "yellow", "flowers"], ["slugs"]], "<verb>"=>[["sigh", "<adverb>"], ["portend", "like", "<object>"], ["die", "<adverb>"]], "<adverb>"=>[["warily"], ["grumpily"]]}
 def to_grammar_hash(split_def_array)
+  puts "inside to_grammar_hash"
   # TODO: your implementation here
-  split_def_array..map{|x| myhash[x[0]] = x.map{|y| y.split(" ")}.slice(1..-1)}
+  myhash = {}
+  split_def_array.map{|x| myhash[x[0]] = x.map{|y| y.split(" ")}.slice(1..-1)}
+  myhash
 end
 
 # Returns true iff s is a non-terminal
 # a.k.a. a string where the first character is <
 #        and the last character is >
 def is_non_terminal?(s)
+  puts "inside is_non_terminal"
   # TODO: your implementation here
   /<\w+>/.match(s)
 end
@@ -71,7 +77,25 @@ end
 # expansion, etc.). The names of non-terminals should be considered
 # case-insensitively, <NOUN> matches <Noun> and <noun>, for example.
 def expand(grammar, non_term="<start>")
+  puts "inside expand"
   # TODO: your implementation here
+  myResultingString = ""
+  if(grammar != nil)
+    myStory = grammar[non_term].sample
+    if(myStory.length > 0)
+      myStory.each{|x|
+        if(is_non_terminal? x )
+          myResultingString += expand(grammar, x)
+        else
+          myResultingString += x + " "
+        end
+      }
+    end
+    myResultingString.gsub(". ", ".")
+  else
+    myResultingString
+  end
+
 end
 
 # Given the name of a grammar file,
@@ -79,10 +103,18 @@ end
 # random expansion of the grammar
 def rsg(filename)
   # TODO: your implementation here
+  puts "inside the constructor"
+  raw_def = read_grammar_defs(filename)
+  split_def = raw_def.map{|x| split_definition(x)}
+  grammar = to_grammar_hash(split_def)
+  expand(grammar)
 end
 
 if __FILE__ == $0
   # TODO: your implementation of the following
   # prompt the user for the name of a grammar file
   # rsg that file
+  puts "Enter a filename"
+  s = gets.chomp
+  rsg(s)
 end
