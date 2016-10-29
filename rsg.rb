@@ -23,14 +23,7 @@ end
 #   split_definition "\n<start>\nYou <adj> <name> . ;\n;\n"
 #     returns ["<start>", "You <adj> <name> .", ""]
 def split_definition(raw_def)
-  # puts "inside split_definition"
-  # this was working on kant.g with read_grammar_defs returning an array.
-  # raw_def.map{|x| x.gsub("\t","").gsub("> ", ">").split(/\n/).slice(1..-1)}.map{|x| x.map{|y| y.split(";")}.flatten}
-
-  # this is following the example above saying that the data comes as a string, although I wasn't able to reproduce the
-  # last example where the last element of the array is empty
-  raw_def.gsub("\t","").split(/\n/).slice(1..-1).flatten.map{|x| x.split(/;/)}.flatten
-
+  raw_def.strip.split(/\n/,2).map{|x| x.split(";")}.flatten.map{|y| y.strip}
 end
 
 # Takes an array of definitions where the definitions have been
@@ -46,7 +39,7 @@ def to_grammar_hash(split_def_array)
   # puts "inside to_grammar_hash"
   # TODO: your implementation here
   myhash = {}
-  split_def_array.map{|x| myhash[x[0]] = x.map{|y| y.split(" ")}.slice(1..-1)}
+  split_def_array.map{|x| myhash[x[0]] = x.map{|y| y.split(/\s+/)}.slice(1..-1)}
   myhash
 end
 
@@ -56,8 +49,7 @@ end
 def is_non_terminal?(s)
   # puts "inside is_non_terminal"
   # TODO: your implementation here
-  # /<\w+-?>/.match(s)
-  s[0] == "<" && s[-1] == ">"
+  /<[\w-]+>/.match(s)
 end
 
 # Given a grammar hash (as returned by to_grammar_hash)
@@ -78,26 +70,21 @@ end
 # expansion, etc.). The names of non-terminals should be considered
 # case-insensitively, <NOUN> matches <Noun> and <noun>, for example.
 def expand(grammar, non_term="<start>")
-  # puts "inside expand"
+
   # TODO: your implementation here
   myResultingString = ""
-  # puts "this is my starting grammar"
-  # print grammar
-  # puts
 
   # if(grammar[non_term] != nil)
     myStory = grammar[non_term].sample
-    # puts "This is the story sample"
-    # print myStory
+
     if(myStory.length > 0)
       myStory.each{|x|
-        # puts "this is the element of the story"
-        # puts x
+
         if(is_non_terminal? x )
-          # puts "for recursion " + x
+
           myResultingString += expand(grammar, x)
         else
-          # puts "added to the string " + x
+
           myResultingString += x + " "
         end
       }
@@ -113,16 +100,9 @@ end
 # random expansion of the grammar
 def rsg(filename)
   # TODO: your implementation here
-  # puts "inside the constructor"
   raw_def = read_grammar_defs(filename)
-  # print raw_def
-  # puts
   split_def = raw_def.map{|x| split_definition(x)}
-  # print split_def
-  # puts
   grammar = to_grammar_hash(split_def)
-  # print grammar
-  # puts
   puts expand(grammar)
 end
 
