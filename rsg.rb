@@ -42,6 +42,7 @@ end
 # returns {"<start>"=>[["The", "<object>", "<verb>", "tonight."]], "<object>"=>[["waves"], ["big", "yellow", "flowers"], ["slugs"]], "<verb>"=>[["sigh", "<adverb>"], ["portend", "like", "<object>"], ["die", "<adverb>"]], "<adverb>"=>[["warily"], ["grumpily"]]}
 def to_grammar_hash(split_def_array)
   # TODO: your implementation here
+  split_def_array..map{|x| myhash[x[0]] = x.map{|y| y.split(" ")}.slice(1..-1)}
 end
 
 # Returns true iff s is a non-terminal
